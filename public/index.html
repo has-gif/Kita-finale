@@ -99,7 +99,7 @@ button:hover{background:#1c60d6}
 <label><input type="checkbox" value="Emotionale Entwicklung"> Emotionale Entwicklung</label>
 <label><input type="checkbox" value="Selbstständigkeit"> Selbstständigkeit</label>
 <label><input type="checkbox" value="Sauberkeitsentwicklung"> Sauberkeitsentwicklung</label>
-<label><input type="checkbox" value="Besondere Talente & Risiken"> Talente & Risiken</label>
+<label><input type="checkbox" value="Ressourcen und besondere Stärken"> Ressourcen & Stärken</label>
 <label><input type="checkbox" value="Unterstützungsbedürftige Bereiche"> Unterstützungsbedarf</label>
 </div>
 
@@ -130,28 +130,46 @@ function buildPrompt(){
 const bereiche=[...document.querySelectorAll("input[type=checkbox]:checked")]
 .map(e=>e.value).join(", ");
 
-const alterRaw=alter.value;
+const alterRaw=alter.value||"";
 let altersHinweis="";
 
 const alterNum=parseFloat(alterRaw.replace(",","."))
 
 if(!isNaN(alterNum)){
- if(alterNum<3) altersHinweis="U3-Kind: kurze, behutsame Formulierungen."
- else if(alterNum<5) altersHinweis="Kindergartenalter: altersangemessen."
- else altersHinweis="Vorschulalter: Fokus auf Selbstständigkeit."
+ if(alterNum<3) altersHinweis="Das Kind befindet sich im U3-Bereich. Formuliere besonders behutsam.";
+ else if(alterNum<5) altersHinweis="Das Kind befindet sich im Kindergartenalter.";
+ else altersHinweis="Das Kind befindet sich im Vorschulalter.";
 }
 
 return `
 Du bist eine pädagogische Fachkraft.
 
-Formuliere sachlich, professionell und wertschätzend.
-Keine Diagnosen. Präsens. Keine Umgangssprache.
+WICHTIG:
+Nutze ausschließlich die folgenden Angaben als Grundlage.
+Erfinde keine neuen Inhalte.
 
-Beispiel:
-"Sozialverhalten:
-Das Kind zeigt kooperatives Verhalten und beteiligt sich an Absprachen."
+Du darfst vorsichtige Deutungen formulieren,
+aber nur, wenn sie logisch aus den Beobachtungen ableitbar sind.
+
+Kennzeichne Vermutungen mit:
+"möglicherweise", "es könnte sein", "dies könnte darauf hinweisen".
+
+Keine Diagnosen. Keine Defizitsprache.
 
 ${altersHinweis}
+
+Besonderer Hinweis:
+Wenn der Bereich "Ressourcen und besondere Stärken" gewählt wurde,
+formuliere ausschließlich ressourcenorientiert und wertschätzend.
+Keine problemorientierten Aussagen.
+
+Beispiele:
+
+"Sozialverhalten:
+Das Kind beteiligt sich kooperativ an gemeinsamen Aktivitäten."
+
+"Ressourcen:
+Das Kind zeigt ausgeprägtes Interesse an kreativen Angeboten."
 
 Rahmendaten:
 Geschlecht: ${geschlecht.value}
@@ -162,7 +180,7 @@ Fachkraft: ${fachkraft.value}
 Situation:
 ${situation.value}
 
-Beobachtung:
+Beobachtungen:
 ${beobachtung.value}
 
 Eingewöhnung:
@@ -174,13 +192,14 @@ ${starthilfen.value}
 Empfehlungen:
 ${empfehlung.value}
 
-Ziel:
+Zielvereinbarung:
 ${ziel.value}
 
-Bereiche:
+Berücksichtigte Bereiche:
 ${bereiche}
 
-Gliedere in sinnvolle Abschnitte.
+Strukturiere den Text in sinnvolle Abschnitte.
+Beziehe dich inhaltlich auf die Angaben.
 `;
 }
 
