@@ -136,40 +136,27 @@ let altersHinweis="";
 const alterNum=parseFloat(alterRaw.replace(",","."))
 
 if(!isNaN(alterNum)){
- if(alterNum<3) altersHinweis="Das Kind befindet sich im U3-Bereich. Formuliere besonders behutsam.";
- else if(alterNum<5) altersHinweis="Das Kind befindet sich im Kindergartenalter.";
- else altersHinweis="Das Kind befindet sich im Vorschulalter.";
+ if(alterNum<3) altersHinweis="U3-Kind: besonders behutsam formulieren.";
+ else if(alterNum<5) altersHinweis="Kindergartenalter: altersangemessen formulieren.";
+ else altersHinweis="Vorschulalter: Fokus auf Selbstständigkeit.";
 }
 
 return `
 Du bist eine pädagogische Fachkraft.
 
 WICHTIG:
-Nutze ausschließlich die folgenden Angaben als Grundlage.
-Erfinde keine neuen Inhalte.
+Nutze nur die angegebenen Beobachtungen.
+Erfinde keine Inhalte.
 
-Du darfst vorsichtige Deutungen formulieren,
-aber nur, wenn sie logisch aus den Beobachtungen ableitbar sind.
-
-Kennzeichne Vermutungen mit:
-"möglicherweise", "es könnte sein", "dies könnte darauf hinweisen".
+Vermutungen nur, wenn sie logisch ableitbar sind.
+Kennzeichne mit: möglicherweise, es könnte sein.
 
 Keine Diagnosen. Keine Defizitsprache.
 
 ${altersHinweis}
 
-Besonderer Hinweis:
 Wenn der Bereich "Ressourcen und besondere Stärken" gewählt wurde,
 formuliere ausschließlich ressourcenorientiert und wertschätzend.
-Keine problemorientierten Aussagen.
-
-Beispiele:
-
-"Sozialverhalten:
-Das Kind beteiligt sich kooperativ an gemeinsamen Aktivitäten."
-
-"Ressourcen:
-Das Kind zeigt ausgeprägtes Interesse an kreativen Angeboten."
 
 Rahmendaten:
 Geschlecht: ${geschlecht.value}
@@ -192,14 +179,13 @@ ${starthilfen.value}
 Empfehlungen:
 ${empfehlung.value}
 
-Zielvereinbarung:
+Ziel:
 ${ziel.value}
 
-Berücksichtigte Bereiche:
+Bereiche:
 ${bereiche}
 
-Strukturiere den Text in sinnvolle Abschnitte.
-Beziehe dich inhaltlich auf die Angaben.
+Strukturiere den Text mit Überschriften.
 `;
 }
 
