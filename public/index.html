@@ -1,195 +1,189 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Kita-Dokumentation</title>
-  <style>
-    body { font-family: Arial, sans-serif; background:#f7f7f7; margin:0; }
-    .container { max-width: 900px; margin: 30px auto; background:#fff; padding: 20px; border-radius: 10px; box-shadow:0 8px 30px rgba(0,0,0,0.06); }
-    h1, h2 { margin-top: 0; color:#2c3e50; }
-    label { display:block; margin-top:12px; font-weight:600; }
-    input[type=text], select, textarea { width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; margin-top:6px; font-size:15px; }
-    .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-    @media (max-width:700px){ .grid{ grid-template-columns:1fr; } }
-    .checkbox-grid { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:10px 20px; margin: 12px 0; }
-    @media (max-width:700px){ .checkbox-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
-    .checkbox-grid label { font-weight:400; display:flex; align-items:center; gap:8px; }
-    .buttons { display:flex; flex-wrap:wrap; gap:10px; margin-top: 14px; }
-    button { padding:10px 16px; border:none; border-radius:6px; background:#2F80ED; color:white; cursor:pointer; }
-    button:hover{ background:#1c60d6; }
-    #gpt-output { white-space:pre-wrap; background:#eef4ff; border-left:4px solid #2F80ED; padding:12px; border-radius:6px; margin-top:16px; min-height:90px; }
-    /* Login overlay */
-    #loginOverlay{ position:fixed; inset:0; background:#fff; z-index:9999; display:flex; align-items:center; justify-content:center; }
-    #loginBox{ background:#fff; padding:28px; border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,0.08); text-align:center; width:min(92vw,420px); }
-    #loginBox input{ width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; margin-top:8px; }
-    #loginBox button{ width:100%; margin-top:12px; }
-    .hint{ color:#6b7280; font-size:13px; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kita-Dokumentation</title>
+
+<style>
+body{font-family:Arial;background:#f7f7f7;margin:0}
+.container{max-width:900px;margin:30px auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.06)}
+h1,h2{color:#2c3e50}
+label{display:block;margin-top:12px;font-weight:600}
+input,select,textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;margin-top:6px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}}
+.checkbox-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+@media(max-width:700px){.checkbox-grid{grid-template-columns:repeat(2,1fr)}}
+button{padding:10px 16px;border:none;border-radius:6px;background:#2f80ed;color:#fff;cursor:pointer}
+button:hover{background:#1c60d6}
+#gpt-output{white-space:pre-wrap;background:#eef4ff;border-left:4px solid #2f80ed;padding:12px;border-radius:6px;margin-top:16px;min-height:90px}
+
+/* Login */
+#loginOverlay{position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center}
+#loginBox{padding:25px;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.1);width:320px;text-align:center}
+</style>
 </head>
+
 <body>
-  <!-- Login first -->
-  <div id="loginOverlay">
-    <div id="loginBox">
-      <h2>Kita-Dokumentation</h2>
-      <p class="hint">Bitte Passwort eingeben, um fortzufahren</p>
-      <input type="password" id="pwInput" placeholder="Passwort (Kita2025)"/>
-      <button onclick="checkLogin()">Login</button>
-      <div id="loginMsg" class="hint"></div>
-    </div>
-  </div>
 
-  <div class="container">
-    <h1>Dokumentation</h1>
+<div id="loginOverlay">
+<div id="loginBox">
+<h2>Kita-Dokumentation</h2>
+<input type="password" id="pwInput" placeholder="Passwort (Kita2025)">
+<button onclick="checkLogin()">Login</button>
+<div id="loginMsg"></div>
+</div>
+</div>
 
-    <div class="grid">
-      <div>
-        <label for="geschlecht">Geschlecht</label>
-        <select id="geschlecht">
-          <option value="">Bitte auswählen</option>
-          <option value="männlich">männlich</option>
-          <option value="weiblich">weiblich</option>
-        </select>
-      </div>
-      <div>
-        <label for="alter">Alter (z. B. 3,1)</label>
-        <input type="text" id="alter" placeholder="z. B. 3,1">
-      </div>
-      <div>
-        <label for="gruppe">Betreuung</label>
-        <select id="gruppe">
-          <option value="">Bitte auswählen</option>
-          <option value="Krippe">Krippe</option>
-          <option value="Kita">Kita</option>
-        </select>
-      </div>
-      <div>
-        <label for="fachkraft">Pädagogische Fachkraft</label>
-        <input type="text" id="fachkraft" placeholder="Name der Fachkraft">
-      </div>
-    </div>
+<div class="container">
+<h1>Dokumentation</h1>
 
-    <label for="situation">Situation</label>
-    <textarea id="situation" rows="2" placeholder="z. B. Freispiel, Morgenkreis, Turnen …"></textarea>
+<div class="grid">
+<div>
+<label>Geschlecht</label>
+<select id="geschlecht">
+<option value="">Bitte auswählen</option>
+<option>männlich</option>
+<option>weiblich</option>
+</select>
+</div>
 
-    <label for="beobachtung">Beobachtung</label>
-    <textarea id="beobachtung" rows="3" placeholder="Was hat das Kind getan? Interaktionen? Verhalten?"></textarea>
+<div>
+<label>Alter (z.B. 4,2)</label>
+<input id="alter">
+</div>
 
-    <label for="eingewoehnung">Eingewöhnung</label>
-    <textarea id="eingewoehnung" rows="2" placeholder="z. B. Eingewöhnung morgen geplant, Verlauf, Beobachtungen …"></textarea>
+<div>
+<label>Betreuung</label>
+<select id="gruppe">
+<option value="">Bitte auswählen</option>
+<option>Krippe</option>
+<option>Kita</option>
+</select>
+</div>
 
-    <label for="starthilfen">Starthilfen</label>
-    <textarea id="starthilfen" rows="2" placeholder="z. B. Impulse, Unterstützung, Spielangebote"></textarea>
+<div>
+<label>Pädagogische Fachkraft</label>
+<input id="fachkraft">
+</div>
+</div>
 
-    <label for="empfehlung">Empfehlung</label>
-    <textarea id="empfehlung" rows="2" placeholder="Nächste Schritte, Begleitung, Beobachtungsschwerpunkte"></textarea>
+<label>Situation</label>
+<textarea id="situation"></textarea>
 
-    <label for="ziel">Zielvereinbarung</label>
-    <textarea id="ziel" rows="2" placeholder="Unterstützung, Förderung, Zusammenarbeit mit Eltern"></textarea>
+<label>Beobachtung</label>
+<textarea id="beobachtung"></textarea>
 
-    <h2>Bereiche</h2>
-    <div class="checkbox-grid">
-      <label><input type="checkbox" value="Sprache">Sprache</label>
-      <label><input type="checkbox" value="Sozialverhalten">Sozialverhalten</label>
-      <label><input type="checkbox" value="Motorik">Motorik</label>
-      <label><input type="checkbox" value="Emotionale Entwicklung">Emotionale Entwicklung</label>
-      <label><input type="checkbox" value="Selbstständigkeit">Selbstständigkeit</label>
-      <label><input type="checkbox" value="Allgemein">Allgemein</label>
-      <label><input type="checkbox" value="Sauberkeitserziehung">Sauberkeitserziehung</label>
-      <label><input type="checkbox" value="Besondere Talente">Besondere Talente</label>
-      <label><input type="checkbox" value="Unterstützungsbedürftige Bereiche">Unterstützungsbedürftige Bereiche</label>
-    </div>
+<label>Eingewöhnung</label>
+<textarea id="eingewoehnung"></textarea>
 
-    <div class="buttons">
-      <button onclick="generateText()">GPT‑Dokumentation generieren</button>
-      <button onclick="exportDoc()">Als DOC speichern</button>
-      <button onclick="exportPDF()">Als PDF speichern</button>
-    </div>
+<label>Starthilfen</label>
+<textarea id="starthilfen"></textarea>
 
-    <div id="gpt-output">Hier erscheint die generierte Beobachtung …</div>
-  </div>
+<label>Empfehlung</label>
+<textarea id="empfehlung"></textarea>
 
-  <script>
-    function checkLogin() {
-      const input = document.getElementById('pwInput').value;
-      if (input === 'Kita2025') {
-        document.getElementById('loginOverlay').style.display = 'none';
-      } else {
-        document.getElementById('loginMsg').textContent = 'Falsches Passwort.';
-      }
-    }
+<label>Zielvereinbarung</label>
+<textarea id="ziel"></textarea>
 
-    function buildPrompt() {
-      const bereiche = Array.from(document.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value).join(', ');
-      const geschlecht = document.getElementById('geschlecht').value || '';
-      const alter = document.getElementById('alter').value || '';
-      const gruppe = document.getElementById('gruppe').value || '';
-      const fachkraft = document.getElementById('fachkraft').value || '';
-      const situation = document.getElementById('situation').value || '';
-      const beobachtung = document.getElementById('beobachtung').value || '';
-      const eingewoehnung = document.getElementById('eingewoehnung').value || '';
-      const starthilfen = document.getElementById('starthilfen').value || '';
-      const empfehlung = document.getElementById('empfehlung').value || '';
-      const ziel = document.getElementById('ziel').value || '';
+<h2>Bereiche</h2>
+<div class="checkbox-grid">
+<label><input type="checkbox" value="Sprache">Sprache</label>
+<label><input type="checkbox" value="Sozialverhalten">Sozialverhalten</label>
+<label><input type="checkbox" value="Motorik">Motorik</label>
+<label><input type="checkbox" value="Emotionale Entwicklung">Emotionale Entwicklung</label>
+<label><input type="checkbox" value="Selbstständigkeit">Selbstständigkeit</label>
+<label><input type="checkbox" value="Sauberkeitsentwicklung">Sauberkeitsentwicklung</label>
+<label><input type="checkbox" value="Besondere Talente & Risiken">Besondere Talente & Risiken</label>
+<label><input type="checkbox" value="Unterstützungsbedürftige Bereiche">Unterstützungsbedürftige Bereiche</label>
+</div>
 
-      return `Erstelle eine klare, fachlich-neutrale pädagogische Dokumentation. Gliedere in:
-1) Kontaktaufnahme, 2) Soziales Verhalten, 3) Emotionales Erleben, 4) Selbstständigkeit, 5) Spielverhalten, 6) Weitere Beobachtungen.
+<br>
+<button onclick="generateText()">GPT-Dokumentation generieren</button>
 
-Meta: Geschlecht: ${geschlecht}, Alter: ${alter}, Betreuung: ${gruppe}, Fachkraft: ${fachkraft}
-Situation: ${situation}
-Beobachtung: ${beobachtung}
-Eingewöhnung: ${eingewoehnung}
-Starthilfen: ${starthilfen}
-Empfehlung: ${empfehlung}
-Zielvereinbarung: ${ziel}
-Ausgewählte Bereiche: ${bereiche}
+<div id="gpt-output">Hier erscheint die generierte Beobachtung…</div>
+</div>
 
-Schreibe kurze Sätze und verzichte auf Wertungen.`;
-    }
+<script>
+function checkLogin(){
+if(pwInput.value==="Kita2025"){
+loginOverlay.style.display="none";
+}else{
+loginMsg.innerText="Falsches Passwort";
+}
+}
 
-    async function generateText() {
-      const out = document.getElementById('gpt-output');
-      out.textContent = '⏳ Anfrage wird gesendet …';
+function buildPrompt(){
 
-      const prompt = buildPrompt();
-      try {
-        const res = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt })
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          out.textContent = '❌ Fehler: ' + (data?.error?.message || JSON.stringify(data));
-          return;
-        }
-        out.textContent = data && data.content ? data.content : '❌ Keine gültige Antwort erhalten.';
-      } catch (e) {
-        out.textContent = '❌ Netzwerk-/Proxyfehler: ' + e.message;
-      }
-    }
+const bereiche=[...document.querySelectorAll("input[type=checkbox]:checked")]
+.map(e=>e.value).join(", ");
 
-    function exportDoc() {
-      const text = document.getElementById('gpt-output').innerText;
-      const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'></head><body>";
-      const source = header + text.replace(/\n/g, "<br>") + "</body></html>";
-      const blob = new Blob([source], { type: 'application/msword' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'kita_doku.doc';
-      a.click();
-    }
+const alterRaw=alter.value;
+let altersHinweis="";
+const alterNum=parseFloat(alterRaw.replace(",","."))
 
-    function exportPDF() {
-      const printWindow = window.open('', '', 'height=700,width=900');
-      printWindow.document.write('<html><head><title>Kita-Doku PDF</title></head><body>');
-      printWindow.document.write('<pre style="white-space:pre-wrap;font-family:inherit;">' + document.getElementById('gpt-output').innerText + '</pre>');
-      printWindow.document.write('</body></html>');
-      printWindow.document.close();
-      printWindow.focus();
-      printWindow.print();
-      printWindow.close();
-    }
-  </script>
+if(!isNaN(alterNum)){
+ if(alterNum<3) altersHinweis="U3-Kind: kurze, behutsame Formulierungen."
+ else if(alterNum<5) altersHinweis="Kindergartenalter: altersangemessen differenziert."
+ else altersHinweis="Vorschulalter: mit Blick auf Selbstständigkeit."
+}
+
+return `
+Du bist eine pädagogische Fachkraft in einer Kita.
+Formuliere sachlich, professionell und wertschätzend.
+Keine Diagnosen. Keine Umgangssprache. Präsens.
+
+${altersHinweis}
+
+Rahmendaten:
+Geschlecht: ${geschlecht.value}
+Alter: ${alterRaw}
+Betreuung: ${gruppe.value}
+Fachkraft: ${fachkraft.value}
+
+Situation:
+${situation.value}
+
+Beobachtung:
+${beobachtung.value}
+
+Eingewöhnung:
+${eingewoehnung.value}
+
+Starthilfen:
+${starthilfen.value}
+
+Empfehlungen:
+${empfehlung.value}
+
+Zielvereinbarung:
+${ziel.value}
+
+Berücksichtigte Bereiche:
+${bereiche}
+
+Gliedere in Abschnitte mit Überschriften.
+`;
+}
+
+async function generateText(){
+const out=document.getElementById("gpt-output");
+out.innerText="⏳ Generiere Text..."
+8
+try{
+const res=await fetch("/api/chat",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({prompt:buildPrompt()})
+})
+const data=await res.json()
+out.innerText=data.content||"Keine Antwort"
+}catch(e){
+out.innerText="Serverfehler"
+}
+}
+</script>
+
 </body>
 </html>
