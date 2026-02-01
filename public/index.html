@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Kita-Dokumentation</title>
 
@@ -15,7 +15,7 @@ input,select,textarea{width:100%;padding:10px;border:1px solid #ddd;border-radiu
 @media(max-width:700px){.grid{grid-template-columns:1fr}}
 .checkbox-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
 @media(max-width:700px){.checkbox-grid{grid-template-columns:repeat(2,1fr)}}
-button{padding:10px 16px;border:none;border-radius:6px;background:#2f80ed;color:#fff;cursor:pointer}
+button{padding:10px 16px;border:none;border-radius:6px;background:#2f80ed;color:#fff;cursor:pointer;margin-top:10px}
 button:hover{background:#1c60d6}
 #gpt-output{white-space:pre-wrap;background:#eef4ff;border-left:4px solid #2f80ed;padding:12px;border-radius:6px;margin-top:16px;min-height:90px}
 
@@ -27,6 +27,7 @@ button:hover{background:#1c60d6}
 
 <body>
 
+<!-- Login -->
 <div id="loginOverlay">
 <div id="loginBox">
 <h2>Kita-Dokumentation</h2>
@@ -37,9 +38,11 @@ button:hover{background:#1c60d6}
 </div>
 
 <div class="container">
+
 <h1>Dokumentation</h1>
 
 <div class="grid">
+
 <div>
 <label>Geschlecht</label>
 <select id="geschlecht">
@@ -67,6 +70,7 @@ button:hover{background:#1c60d6}
 <label>Pädagogische Fachkraft</label>
 <input id="fachkraft">
 </div>
+
 </div>
 
 <label>Situation</label>
@@ -88,31 +92,39 @@ button:hover{background:#1c60d6}
 <textarea id="ziel"></textarea>
 
 <h2>Bereiche</h2>
+
 <div class="checkbox-grid">
-<label><input type="checkbox" value="Sprache">Sprache</label>
-<label><input type="checkbox" value="Sozialverhalten">Sozialverhalten</label>
-<label><input type="checkbox" value="Motorik">Motorik</label>
-<label><input type="checkbox" value="Emotionale Entwicklung">Emotionale Entwicklung</label>
-<label><input type="checkbox" value="Selbstständigkeit">Selbstständigkeit</label>
-<label><input type="checkbox" value="Sauberkeitsentwicklung">Sauberkeitsentwicklung</label>
-<label><input type="checkbox" value="Besondere Talente & Risiken">Besondere Talente & Risiken</label>
-<label><input type="checkbox" value="Unterstützungsbedürftige Bereiche">Unterstützungsbedürftige Bereiche</label>
+<label><input type="checkbox" value="Sprache"> Sprache</label>
+<label><input type="checkbox" value="Sozialverhalten"> Sozialverhalten</label>
+<label><input type="checkbox" value="Motorik"> Motorik</label>
+<label><input type="checkbox" value="Emotionale Entwicklung"> Emotionale Entwicklung</label>
+<label><input type="checkbox" value="Selbstständigkeit"> Selbstständigkeit</label>
+<label><input type="checkbox" value="Sauberkeitsentwicklung"> Sauberkeitsentwicklung</label>
+<label><input type="checkbox" value="Besondere Talente & Risiken"> Talente & Risiken</label>
+<label><input type="checkbox" value="Unterstützungsbedürftige Bereiche"> Unterstützungsbedarf</label>
 </div>
 
 <br>
+
 <button onclick="generateText()">GPT-Dokumentation generieren</button>
+<button onclick="exportWord()">Als Word herunterladen</button>
 
 <div id="gpt-output">Hier erscheint die generierte Beobachtung…</div>
+
 </div>
 
 <script>
+/* Login */
+
 function checkLogin(){
-if(pwInput.value==="Kita2025"){
-loginOverlay.style.display="none";
-}else{
-loginMsg.innerText="Falsches Passwort";
+ if(pwInput.value==="Kita2025"){
+  loginOverlay.style.display="none";
+ }else{
+  loginMsg.innerText="Falsches Passwort";
+ }
 }
-}
+
+/* Prompt Builder */
 
 function buildPrompt(){
 
@@ -121,18 +133,24 @@ const bereiche=[...document.querySelectorAll("input[type=checkbox]:checked")]
 
 const alterRaw=alter.value;
 let altersHinweis="";
+
 const alterNum=parseFloat(alterRaw.replace(",","."))
 
 if(!isNaN(alterNum)){
  if(alterNum<3) altersHinweis="U3-Kind: kurze, behutsame Formulierungen."
- else if(alterNum<5) altersHinweis="Kindergartenalter: altersangemessen differenziert."
- else altersHinweis="Vorschulalter: mit Blick auf Selbstständigkeit."
+ else if(alterNum<5) altersHinweis="Kindergartenalter: altersangemessen."
+ else altersHinweis="Vorschulalter: Fokus auf Selbstständigkeit."
 }
 
 return `
-Du bist eine pädagogische Fachkraft in einer Kita.
+Du bist eine pädagogische Fachkraft.
+
 Formuliere sachlich, professionell und wertschätzend.
-Keine Diagnosen. Keine Umgangssprache. Präsens.
+Keine Diagnosen. Präsens. Keine Umgangssprache.
+
+Beispiel:
+"Sozialverhalten:
+Das Kind zeigt kooperatives Verhalten und beteiligt sich an Absprachen."
 
 ${altersHinweis}
 
@@ -157,31 +175,76 @@ ${starthilfen.value}
 Empfehlungen:
 ${empfehlung.value}
 
-Zielvereinbarung:
+Ziel:
 ${ziel.value}
 
-Berücksichtigte Bereiche:
+Bereiche:
 ${bereiche}
 
-Gliedere in Abschnitte mit Überschriften.
+Gliedere in sinnvolle Abschnitte.
 `;
 }
 
+/* GPT */
+
 async function generateText(){
+
 const out=document.getElementById("gpt-output");
-out.innerText="⏳ Generiere Text..."
-8
+out.innerText="⏳ Generiere..."
+
 try{
+
 const res=await fetch("/api/chat",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({prompt:buildPrompt()})
+ method:"POST",
+ headers:{"Content-Type":"application/json"},
+ body:JSON.stringify({prompt:buildPrompt()})
 })
+
 const data=await res.json()
 out.innerText=data.content||"Keine Antwort"
-}catch(e){
-out.innerText="Serverfehler"
+
+}catch{
+ out.innerText="Serverfehler"
 }
+}
+
+/* Word Export */
+
+async function exportWord(){
+
+const data={
+ geschlecht:geschlecht.value,
+ alter:alter.value,
+ gruppe:gruppe.value,
+ fachkraft:fachkraft.value,
+ situation:situation.value,
+ beobachtung:beobachtung.value,
+ eingewoehnung:eingewoehnung.value,
+ starthilfen:starthilfen.value,
+ empfehlung:empfehlung.value,
+ ziel:ziel.value,
+ text:document.getElementById("gpt-output").innerText
+};
+
+try{
+
+const res=await fetch("/api/export",{
+ method:"POST",
+ headers:{"Content-Type":"application/json"},
+ body:JSON.stringify(data)
+})
+
+const blob=await res.blob();
+
+const a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="kita_dokumentation.docx";
+a.click();
+
+}catch{
+ alert("Export fehlgeschlagen");
+}
+
 }
 </script>
 
