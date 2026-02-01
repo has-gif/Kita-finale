@@ -19,7 +19,6 @@ button{padding:10px 16px;border:none;border-radius:6px;background:#2f80ed;color:
 button:hover{background:#1c60d6}
 #gpt-output{white-space:pre-wrap;background:#eef4ff;border-left:4px solid #2f80ed;padding:12px;border-radius:6px;margin-top:16px;min-height:90px}
 
-/* Login */
 #loginOverlay{position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center}
 #loginBox{padding:25px;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.1);width:320px;text-align:center}
 </style>
@@ -27,7 +26,7 @@ button:hover{background:#1c60d6}
 
 <body>
 
-<!-- Login -->
+<!-- LOGIN -->
 <div id="loginOverlay">
 <div id="loginBox">
 <h2>Kita-Dokumentation</h2>
@@ -116,13 +115,73 @@ button:hover{background:#1c60d6}
 
 <script>
 
-/* Login */
+/* LOGIN */
 function checkLogin(){
  if(pwInput.value==="Kita2025"){
   loginOverlay.style.display="none";
  }else{
   loginMsg.innerText="Falsches Passwort";
  }
+}
+
+/* PROMPT */
+function buildPrompt(){
+
+const bereiche=[...document.querySelectorAll("input[type=checkbox]:checked")]
+.map(e=>e.value).join(", ");
+
+const alterRaw=alter.value;
+let altersHinweis="";
+
+const alterNum=parseFloat(alterRaw.replace(",","."))
+
+if(!isNaN(alterNum)){
+ if(alterNum<3) altersHinweis="U3-Kind: kurze, behutsame Formulierungen."
+ else if(alterNum<5) altersHinweis="Kindergartenalter: altersangemessen."
+ else altersHinweis="Vorschulalter: Fokus auf Selbstständigkeit."
+}
+
+return `
+Du bist eine pädagogische Fachkraft.
+
+Formuliere sachlich, professionell und wertschätzend.
+Keine Diagnosen. Präsens. Keine Umgangssprache.
+
+Beispiel:
+"Sozialverhalten:
+Das Kind zeigt kooperatives Verhalten und beteiligt sich an Absprachen."
+
+${altersHinweis}
+
+Rahmendaten:
+Geschlecht: ${geschlecht.value}
+Alter: ${alterRaw}
+Betreuung: ${gruppe.value}
+Fachkraft: ${fachkraft.value}
+
+Situation:
+${situation.value}
+
+Beobachtung:
+${beobachtung.value}
+
+Eingewöhnung:
+${eingewoehnung.value}
+
+Starthilfen:
+${starthilfen.value}
+
+Empfehlungen:
+${empfehlung.value}
+
+Ziel:
+${ziel.value}
+
+Bereiche:
+${bereiche}
+
+Gliedere in sinnvolle Abschnitte.
+`;
 }
 
 /* GPT */
@@ -136,7 +195,7 @@ try{
 const res=await fetch("/api/chat",{
  method:"POST",
  headers:{"Content-Type":"application/json"},
- body:JSON.stringify({prompt:"Erstelle eine professionelle pädagogische Beobachtung."})
+ body:JSON.stringify({prompt:buildPrompt()})
 })
 
 const data=await res.json()
@@ -147,7 +206,7 @@ out.innerText=data.content||"Keine Antwort"
 }
 }
 
-/* PDF Export */
+/* PDF */
 function exportPDF(){
 
 const text=document.getElementById("gpt-output").innerText;
@@ -178,24 +237,43 @@ win.focus();
 win.print();
 }
 
-/* Word Export */
-function exportWord(){
+/* WORD */
+async function exportWord(){
 
-const text=document.getElementById("gpt-output").innerText;
+const data={
+ geschlecht:geschlecht.value,
+ alter:alter.value,
+ gruppe:gruppe.value,
+ fachkraft:fachkraft.value,
+ situation:situation.value,
+ beobachtung:beobachtung.value,
+ eingewoehnung:eingewoehnung.value,
+ starthilfen:starthilfen.value,
+ empfehlung:empfehlung.value,
+ ziel:ziel.value,
+ text:document.getElementById("gpt-output").innerText
+};
 
-const header="<html><head><meta charset='utf-8'></head><body>";
-const footer="</body></html>";
+try{
 
-const source=header+text.replace(/\n/g,"<br>")+footer;
+const res=await fetch("/api/export",{
+ method:"POST",
+ headers:{"Content-Type":"application/json"},
+ body:JSON.stringify(data)
+})
 
-const blob=new Blob([source],{type:"application/msword"});
+const blob=await res.blob();
 
 const a=document.createElement("a");
 a.href=URL.createObjectURL(blob);
-a.download="kita_dokumentation.doc";
+a.download="kita_dokumentation.docx";
 a.click();
+
+}catch{
+ alert("Export fehlgeschlagen");
 }
 
+}
 </script>
 
 </body>
