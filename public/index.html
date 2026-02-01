@@ -107,15 +107,16 @@ button:hover{background:#1c60d6}
 <br>
 
 <button onclick="generateText()">GPT-Dokumentation generieren</button>
-<button onclick="exportWord()">Als Word herunterladen</button>
+<button onclick="exportPDF()">Als PDF speichern</button>
+<button onclick="exportWord()">Export zu Word</button>
 
 <div id="gpt-output">Hier erscheint die generierte Beobachtung…</div>
 
 </div>
 
 <script>
-/* Login */
 
+/* Login */
 function checkLogin(){
  if(pwInput.value==="Kita2025"){
   loginOverlay.style.display="none";
@@ -124,69 +125,7 @@ function checkLogin(){
  }
 }
 
-/* Prompt Builder */
-
-function buildPrompt(){
-
-const bereiche=[...document.querySelectorAll("input[type=checkbox]:checked")]
-.map(e=>e.value).join(", ");
-
-const alterRaw=alter.value;
-let altersHinweis="";
-
-const alterNum=parseFloat(alterRaw.replace(",","."))
-
-if(!isNaN(alterNum)){
- if(alterNum<3) altersHinweis="U3-Kind: kurze, behutsame Formulierungen."
- else if(alterNum<5) altersHinweis="Kindergartenalter: altersangemessen."
- else altersHinweis="Vorschulalter: Fokus auf Selbstständigkeit."
-}
-
-return `
-Du bist eine pädagogische Fachkraft.
-
-Formuliere sachlich, professionell und wertschätzend.
-Keine Diagnosen. Präsens. Keine Umgangssprache.
-
-Beispiel:
-"Sozialverhalten:
-Das Kind zeigt kooperatives Verhalten und beteiligt sich an Absprachen."
-
-${altersHinweis}
-
-Rahmendaten:
-Geschlecht: ${geschlecht.value}
-Alter: ${alterRaw}
-Betreuung: ${gruppe.value}
-Fachkraft: ${fachkraft.value}
-
-Situation:
-${situation.value}
-
-Beobachtung:
-${beobachtung.value}
-
-Eingewöhnung:
-${eingewoehnung.value}
-
-Starthilfen:
-${starthilfen.value}
-
-Empfehlungen:
-${empfehlung.value}
-
-Ziel:
-${ziel.value}
-
-Bereiche:
-${bereiche}
-
-Gliedere in sinnvolle Abschnitte.
-`;
-}
-
 /* GPT */
-
 async function generateText(){
 
 const out=document.getElementById("gpt-output");
@@ -197,7 +136,7 @@ try{
 const res=await fetch("/api/chat",{
  method:"POST",
  headers:{"Content-Type":"application/json"},
- body:JSON.stringify({prompt:buildPrompt()})
+ body:JSON.stringify({prompt:"Erstelle eine professionelle pädagogische Beobachtung."})
 })
 
 const data=await res.json()
@@ -208,44 +147,55 @@ out.innerText=data.content||"Keine Antwort"
 }
 }
 
+/* PDF Export */
+function exportPDF(){
+
+const text=document.getElementById("gpt-output").innerText;
+
+const win=window.open("","","width=900,height=700");
+
+win.document.write(`
+<html>
+<head>
+<title>Kita-Dokumentation</title>
+<style>
+body{font-family:Arial;padding:40px}
+h1{text-align:center}
+</style>
+</head>
+<body>
+
+<h1>Kita-Dokumentation</h1>
+
+<pre>${text}</pre>
+
+</body>
+</html>
+`);
+
+win.document.close();
+win.focus();
+win.print();
+}
+
 /* Word Export */
+function exportWord(){
 
-async function exportWord(){
+const text=document.getElementById("gpt-output").innerText;
 
-const data={
- geschlecht:geschlecht.value,
- alter:alter.value,
- gruppe:gruppe.value,
- fachkraft:fachkraft.value,
- situation:situation.value,
- beobachtung:beobachtung.value,
- eingewoehnung:eingewoehnung.value,
- starthilfen:starthilfen.value,
- empfehlung:empfehlung.value,
- ziel:ziel.value,
- text:document.getElementById("gpt-output").innerText
-};
+const header="<html><head><meta charset='utf-8'></head><body>";
+const footer="</body></html>";
 
-try{
+const source=header+text.replace(/\n/g,"<br>")+footer;
 
-const res=await fetch("/api/export",{
- method:"POST",
- headers:{"Content-Type":"application/json"},
- body:JSON.stringify(data)
-})
-
-const blob=await res.blob();
+const blob=new Blob([source],{type:"application/msword"});
 
 const a=document.createElement("a");
 a.href=URL.createObjectURL(blob);
-a.download="kita_dokumentation.docx";
+a.download="kita_dokumentation.doc";
 a.click();
-
-}catch{
- alert("Export fehlgeschlagen");
 }
 
-}
 </script>
 
 </body>
